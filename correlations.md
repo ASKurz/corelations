@@ -183,7 +183,7 @@ c
     ## 2 u0    u2     0.133 -0.0546  0.316   0.95 median qi       
     ## 3 u1    u2    -0.475 -0.605  -0.314   0.95 median qi
 
-Now we'll be the same estimates but for the opposite sides of the diagonal.
+Now we'll repeat the estimates for the opposite sides of the diagonal.
 
 ``` r
 c <-

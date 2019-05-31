@@ -104,7 +104,7 @@ c <-
 c
 ```
 
-Now we'll be the same estimates but for the opposite sides of the diagonal.
+Now we'll repeat the estimates for the opposite sides of the diagonal.
 
 ```{r}
 c <-
