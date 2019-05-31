@@ -11,8 +11,8 @@ Simulate data for three variables with known correlations.
 ``` r
 library(tidyverse)
 
-m <- c(0, 0, 0)  # the means
-s <- c(1, 1, 1)  # the sigmas
+m <- c(0, 0, 0)      # the means
+s <- c(1, 1, 1)      # the sigmas
 r <- c(.6, .1, -.5)  # the correlations
 
 # here's the variance/covariance matrix
@@ -212,14 +212,13 @@ c %>%
 
   ggplot(aes(x = value, y = 0)) +
   geom_pointintervalh() +
-  scale_y_discrete(position = "right") +
-  labs(x     = expression(rho),
-       y     = NULL) +
+  scale_y_discrete(NULL, position = "right") +
+  xlab(expression(rho)) +
   coord_cartesian(xlim = -1:1) +
-  theme(axis.text.y = element_text(hjust = 0),
-        strip.background = element_blank(),
-        strip.text.y = element_text(angle = 180, hjust = 0)) +
-  facet_grid(l~r, labeller = label_parsed, scales = "free_y", switch = "y")
+  theme(strip.background = element_blank(),
+        strip.text.y     = element_text(angle = 180, hjust = 0),
+        axis.text.y      = element_text(hjust = 0)) +
+  facet_grid(l~r, switch = "y")
 ```
 
 ![](correlations_files/figure-markdown_github/unnamed-chunk-9-1.png)
@@ -251,53 +250,53 @@ sessionInfo()
     ##  [9] tidyr_0.8.1     tibble_2.1.1    ggplot2_3.1.1   tidyverse_1.2.1
     ## 
     ## loaded via a namespace (and not attached):
-    ##   [1] nlme_3.1-137              matrixStats_0.54.0       
-    ##   [3] xts_0.10-2                lubridate_1.7.4          
-    ##   [5] RColorBrewer_1.1-2        threejs_0.3.1            
-    ##   [7] httr_1.3.1                rprojroot_1.3-2          
-    ##   [9] rstan_2.18.2              tools_3.5.1              
-    ##  [11] backports_1.1.4           utf8_1.1.4               
-    ##  [13] R6_2.3.0                  DT_0.4                   
-    ##  [15] lazyeval_0.2.2            colorspace_1.3-2         
-    ##  [17] withr_2.1.2               prettyunits_1.0.2        
-    ##  [19] processx_3.2.1            tidyselect_0.2.5         
-    ##  [21] gridExtra_2.3             GGally_1.4.0             
-    ##  [23] Brobdingnag_1.2-6         compiler_3.5.1           
-    ##  [25] cli_1.0.1                 rvest_0.3.2              
-    ##  [27] arrayhelpers_1.0-20160527 xml2_1.2.0               
-    ##  [29] shinyjs_1.0               labeling_0.3             
-    ##  [31] colourpicker_1.0          scales_1.0.0             
-    ##  [33] dygraphs_1.1.1.5          mvtnorm_1.0-10           
-    ##  [35] callr_3.1.0               ggridges_0.5.0           
-    ##  [37] StanHeaders_2.18.0-1      digest_0.6.18            
-    ##  [39] rmarkdown_1.10            base64enc_0.1-3          
-    ##  [41] pkgconfig_2.0.2           htmltools_0.3.6          
-    ##  [43] htmlwidgets_1.2           rlang_0.3.4              
-    ##  [45] readxl_1.1.0              rstudioapi_0.7           
-    ##  [47] shiny_1.1.0               svUnit_0.7-12            
-    ##  [49] generics_0.0.2            zoo_1.8-2                
-    ##  [51] jsonlite_1.5              crosstalk_1.0.0          
-    ##  [53] gtools_3.8.1              inline_0.3.15            
-    ##  [55] magrittr_1.5              loo_2.1.0                
-    ##  [57] bayesplot_1.6.0           Matrix_1.2-14            
-    ##  [59] fansi_0.4.0               munsell_0.5.0            
-    ##  [61] abind_1.4-5               stringi_1.4.3            
-    ##  [63] yaml_2.1.19               ggstance_0.3             
-    ##  [65] pkgbuild_1.0.2            plyr_1.8.4               
-    ##  [67] grid_3.5.1                parallel_3.5.1           
-    ##  [69] promises_1.0.1            crayon_1.3.4             
-    ##  [71] miniUI_0.1.1.1            lattice_0.20-35          
-    ##  [73] haven_1.1.2               hms_0.4.2                
-    ##  [75] ps_1.2.1                  knitr_1.20               
-    ##  [77] pillar_1.3.1              igraph_1.2.1             
-    ##  [79] markdown_0.8              shinystan_2.5.0          
-    ##  [81] codetools_0.2-15          stats4_3.5.1             
-    ##  [83] reshape2_1.4.3            rstantools_1.5.1         
-    ##  [85] glue_1.3.1.9000           evaluate_0.10.1          
-    ##  [87] modelr_0.1.2              httpuv_1.4.4.2           
-    ##  [89] cellranger_1.1.0          gtable_0.3.0             
-    ##  [91] reshape_0.8.7             assertthat_0.2.0         
-    ##  [93] mime_0.5                  xtable_1.8-2             
-    ##  [95] broom_0.5.1               coda_0.19-2              
-    ##  [97] later_0.7.3               rsconnect_0.8.8          
-    ##  [99] shinythemes_1.1.1         bridgesampling_0.6-0
+    ##  [1] nlme_3.1-137              matrixStats_0.54.0       
+    ##  [3] xts_0.10-2                lubridate_1.7.4          
+    ##  [5] RColorBrewer_1.1-2        threejs_0.3.1            
+    ##  [7] httr_1.3.1                rprojroot_1.3-2          
+    ##  [9] rstan_2.18.2              tools_3.5.1              
+    ## [11] backports_1.1.4           utf8_1.1.4               
+    ## [13] R6_2.3.0                  DT_0.4                   
+    ## [15] lazyeval_0.2.2            colorspace_1.3-2         
+    ## [17] withr_2.1.2               prettyunits_1.0.2        
+    ## [19] processx_3.2.1            tidyselect_0.2.5         
+    ## [21] gridExtra_2.3             GGally_1.4.0             
+    ## [23] Brobdingnag_1.2-6         compiler_3.5.1           
+    ## [25] cli_1.0.1                 rvest_0.3.2              
+    ## [27] arrayhelpers_1.0-20160527 xml2_1.2.0               
+    ## [29] shinyjs_1.0               labeling_0.3             
+    ## [31] colourpicker_1.0          scales_1.0.0             
+    ## [33] dygraphs_1.1.1.5          mvtnorm_1.0-10           
+    ## [35] callr_3.1.0               ggridges_0.5.0           
+    ## [37] StanHeaders_2.18.0-1      digest_0.6.18            
+    ## [39] rmarkdown_1.10            base64enc_0.1-3          
+    ## [41] pkgconfig_2.0.2           htmltools_0.3.6          
+    ## [43] htmlwidgets_1.2           rlang_0.3.4              
+    ## [45] readxl_1.1.0              rstudioapi_0.7           
+    ## [47] shiny_1.1.0               svUnit_0.7-12            
+    ## [49] generics_0.0.2            zoo_1.8-2                
+    ## [51] jsonlite_1.5              crosstalk_1.0.0          
+    ## [53] gtools_3.8.1              inline_0.3.15            
+    ## [55] magrittr_1.5              loo_2.1.0                
+    ## [57] bayesplot_1.6.0           Matrix_1.2-14            
+    ## [59] fansi_0.4.0               munsell_0.5.0            
+    ## [61] abind_1.4-5               stringi_1.4.3            
+    ## [63] yaml_2.1.19               ggstance_0.3             
+    ## [65] pkgbuild_1.0.2            plyr_1.8.4               
+    ## [67] grid_3.5.1                parallel_3.5.1           
+    ## [69] promises_1.0.1            crayon_1.3.4             
+    ## [71] miniUI_0.1.1.1            lattice_0.20-35          
+    ## [73] haven_1.1.2               hms_0.4.2                
+    ## [75] ps_1.2.1                  knitr_1.20               
+    ## [77] pillar_1.3.1              igraph_1.2.1             
+    ## [79] markdown_0.8              shinystan_2.5.0          
+    ## [81] stats4_3.5.1              reshape2_1.4.3           
+    ## [83] rstantools_1.5.1          glue_1.3.1.9000          
+    ## [85] evaluate_0.10.1           modelr_0.1.2             
+    ## [87] httpuv_1.4.4.2            cellranger_1.1.0         
+    ## [89] gtable_0.3.0              reshape_0.8.7            
+    ## [91] assertthat_0.2.0          mime_0.5                 
+    ## [93] xtable_1.8-2              broom_0.5.1              
+    ## [95] coda_0.19-2               later_0.7.3              
+    ## [97] rsconnect_0.8.8           shinythemes_1.1.1        
+    ## [99] bridgesampling_0.6-0

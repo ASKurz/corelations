@@ -12,8 +12,8 @@ Simulate data for three variables with known correlations.
 ```{r, warning = F, message = F}
 library(tidyverse)
 
-m <- c(0, 0, 0)  # the means
-s <- c(1, 1, 1)  # the sigmas
+m <- c(0, 0, 0)      # the means
+s <- c(1, 1, 1)      # the sigmas
 r <- c(.6, .1, -.5)  # the correlations
 
 # here's the variance/covariance matrix
@@ -123,23 +123,18 @@ c %>%
 
   ggplot(aes(x = value, y = 0)) +
   geom_pointintervalh() +
-  scale_y_discrete(position = "right") +
-  labs(x     = expression(rho),
-       y     = NULL) +
+  scale_y_discrete(NULL, position = "right") +
+  xlab(expression(rho)) +
   coord_cartesian(xlim = -1:1) +
-  theme(axis.text.y = element_text(hjust = 0),
-        strip.background = element_blank(),
-        strip.text.y = element_text(angle = 180, hjust = 0)) +
-  facet_grid(l~r, labeller = label_parsed, scales = "free_y", switch = "y")
+  theme(strip.background = element_blank(),
+        strip.text.y     = element_text(angle = 180, hjust = 0),
+        axis.text.y      = element_text(hjust = 0)) +
+  facet_grid(l~r, switch = "y")
 ```
-
 
 ## Session info
 
 ```{r}
 sessionInfo()
 ```
-
-
-
 
