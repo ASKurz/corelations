@@ -1,0 +1,145 @@
+---
+title: "It's hard to plot Bayesian correlations"
+author: "A Solomon Kurz"
+date: "`r format(Sys.Date())`"
+output: github_document
+---
+
+## Data
+
+Simulate data for three variables with known correlations.
+
+```{r, warning = F, message = F}
+library(tidyverse)
+
+m <- c(0, 0, 0)  # the means
+s <- c(1, 1, 1)  # the sigmas
+r <- c(.6, .1, -.5)  # the correlations
+
+# here's the variance/covariance matrix
+v <- 
+  matrix(c((s[1] * s[1]),        (s[2] * s[1] * r[1]), (s[3] * s[1] * r[2]),
+           (s[2] * s[1] * r[1]), (s[2] * s[2]),        (s[3] * s[2] * r[3]),
+           (s[3] * s[1] * r[2]), (s[3] * s[2] * r[3]), (s[3] * s[3])),
+         nrow = 3, ncol = 3)
+
+# after setting our seed, we're ready to simulate with `mvtnorm::rmvnorm()`
+set.seed(1)
+d <- 
+  mvtnorm::rmvnorm(n = 100, mean = m, sigma = v) %>% 
+  data.frame() %>% 
+  set_names(str_c("u_", 0:2))
+
+head(d)
+```
+
+They look like this.
+
+```{r, fig.width = 4.25, fig.height = 4}
+d %>% 
+  GGally::ggpairs()
+```
+
+## Model
+
+Load brms and tidybayes.
+
+```{r, warning = F, message = F}
+library(brms)
+library(tidybayes)
+```
+
+To get the correlation estimates, fit an intercepts-only multivariate model.
+
+```{r fit, cache = T, warning = F, message = F, results = "hide"}
+fit <- 
+  brm(data = d, 
+      family = gaussian,
+      mvbind(u_0, u_1, u_2) ~ 1,
+      prior = c(prior(normal(0, 1), class = Intercept),
+                prior(normal(1, 1), class = sigma, resp = u0),
+                prior(normal(1, 1), class = sigma, resp = u1),
+                prior(normal(1, 1), class = sigma, resp = u2),
+                prior(lkj(4), class = rescor)),
+      chains = 4, cores = 4, 
+      seed = 1,
+      file = "fit")
+```
+
+Here are the model results.
+
+```{r}
+print(fit)
+```
+
+Here's a more focused look at the correlations.
+
+```{r}
+VarCorr(fit)$residual__$cor
+```
+
+## Get ready to plot
+
+Here we'll extract the posterior samples for the correlations and summarize them with `tidybayes::median_qi()`.
+
+```{r}
+c <- 
+  posterior_samples(fit) %>% 
+  select(starts_with("rescor")) %>% 
+  gather() %>% 
+  group_by(key) %>% 
+  median_qi(value)
+  
+print(c)
+```
+
+The names in `key` are a mess. Let's rearrange a bit.
+
+```{r}
+c <-
+  c %>% 
+  mutate(key = str_remove(key, "rescor__")) %>% 
+  separate(key, into = c("l", "r"))
+
+c
+```
+
+Now we'll be the same estimates but for the opposite sides of the diagonal.
+
+```{r}
+c <-
+  c %>% 
+  rename(l = r, 
+         r = l) %>% 
+  bind_rows(c)
+
+c
+```
+
+Here's a way to plot the coefficients in a correlation-matrix-like presentation.
+
+```{r, fig.width = 6.4, fig.height = 2.75}
+c %>% 
+
+  ggplot(aes(x = value, y = 0)) +
+  geom_pointintervalh() +
+  scale_y_discrete(position = "right") +
+  labs(x     = expression(rho),
+       y     = NULL) +
+  coord_cartesian(xlim = -1:1) +
+  theme(axis.text.y = element_text(hjust = 0),
+        strip.background = element_blank(),
+        strip.text.y = element_text(angle = 180, hjust = 0)) +
+  facet_grid(l~r, labeller = label_parsed, scales = "free_y", switch = "y")
+```
+
+
+## Session info
+
+```{r}
+sessionInfo()
+```
+
+
+
+
