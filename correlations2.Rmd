@@ -1,0 +1,119 @@
+---
+title: "Adding upper triangle strings"
+author: "Jeffrey M Girard"
+date: "`r format(Sys.Date())`"
+output: github_document
+---
+
+```{r setup, message=FALSE}
+library(mvtnorm)
+library(brms)
+library(tidybayes)
+library(tidyverse)
+```
+
+## Data
+
+```{r, warning=FALSE}
+# Recreate data
+m <- c(0.0, 0.0, 0.0)
+s <- c(1.0, 1.0, 1.0)
+r <- c(0.6, 0.1, -0.5)
+v <- matrix(
+  c(
+    (s[1] * s[1]), 
+    (s[2] * s[1] * r[1]), 
+    (s[3] * s[1] * r[2]),
+    (s[2] * s[1] * r[1]), 
+    (s[2] * s[2]), 
+    (s[3] * s[2] * r[3]),
+    (s[3] * s[1] * r[2]), 
+    (s[3] * s[2] * r[3]), 
+    (s[3] * s[3])
+  ),
+  nrow = 3, 
+  ncol = 3
+)
+RNGversion("3.5.1")
+set.seed(1)
+d <-
+  mvtnorm::rmvnorm(n = 100, mean = m, sigma = v) %>%
+  data.frame() %>%
+  set_names(str_c("u_", 0:2))
+```
+
+## Model
+
+```{r fit, cache = TRUE, warning = FALSE, message = FALSE, results = "hide"}
+# Recreate model
+fit <-
+  brm(
+    data = d,
+    family = gaussian,
+    formula = mvbind(u_0, u_1, u_2) ~ 1,
+    prior = c(
+      prior(normal(0, 1), class = Intercept),
+      prior(normal(1, 1), class = sigma, resp = u0),
+      prior(normal(1, 1), class = sigma, resp = u1),
+      prior(normal(1, 1), class = sigma, resp = u2),
+      prior(lkj(4), class = rescor)
+    ),
+    chains = 4, 
+    cores = 4,
+    seed = 1,
+    file = "fit"
+  )
+```
+
+## Tidy
+
+```{r cmat}
+# Create data for upper triangle
+upper <- 
+  posterior_samples(fit) %>% 
+  select(starts_with("rescor")) %>% 
+  gather() %>% 
+  group_by(key) %>% 
+  median_qi(value) %>% 
+  mutate(key = str_remove(key, "rescor__")) %>% 
+  separate(key, into = c("row", "col"))
+# Create data for lower triangle
+lower <- 
+  upper %>% 
+  rename(row = col, col = row)
+# Combine the data for the two triangles
+cmat <- 
+  bind_rows("lower" = lower, "upper" = upper, .id = "triangle") %>% 
+  # Add the estimate string and drop the non-plotted data
+  mutate(
+    .string = sprintf("%.2f [%.2f, %.2f]", value, .lower, .upper),
+    value = if_else(triangle == "lower", value, NA_real_),
+    .string = if_else(triangle == "upper", .string, NA_character_)
+  ) %>% 
+  select(triangle:.upper, .string, .width) %>% 
+  print()
+```
+
+## Plot
+
+```{r plot, fig.width = 6.4, fig.height = 2.75}
+# Recreate the plot adding geom_text() for the upper triangle
+cmat %>% 
+  ggplot(aes(x = value, y = 0)) +
+  geom_pointintervalh(na.rm = TRUE) +
+  geom_text(aes(label = .string), x = 0, na.rm = TRUE) +
+  scale_y_discrete(NULL, position = "right") +
+  xlab(expression(rho)) +
+  coord_cartesian(xlim = -1:1) +
+  theme(strip.background = element_blank(),
+        strip.text.y     = element_text(angle = 180, hjust = 0),
+        axis.text.y      = element_text(hjust = 0)) +
+  facet_grid(row ~ col, switch = "y")
+```
+
+## Session
+
+```{r}
+sessionInfo()
+```
+
